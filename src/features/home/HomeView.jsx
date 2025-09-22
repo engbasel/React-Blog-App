@@ -4,8 +4,10 @@ import Post from '../../components/post'
 export default function Home() {
 
   const fetchPosts = async () => {
-    // هنا بتجيب الداتا سواء من local أو API
     const response = await fetch('http://localhost:3000/posts');
+    console.log(response);
+    console.log('pipe is Connected ');
+    
     const data = await response.json();
     setPosts(data);  
   };
