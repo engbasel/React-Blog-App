@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./AddPost.css"; // استدعاء ملف css
+import "./AddPost.css"; 
 
 export default function AddPost() {
   const [title, setTitle] = useState("");
@@ -8,7 +8,7 @@ export default function AddPost() {
   const [preview, setPreview] = useState(null);
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0]; // أول صورة يختارها
+    const file = e.target.files[0]; 
     if (file) {
       setImage(file);
       setPreview(URL.createObjectURL(file)); 
