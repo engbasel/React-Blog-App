@@ -10,7 +10,6 @@
 
 import React from "react";
 import "./Post.css"; // لو هتحط CSS في ملف منفصل
-
 export default function Post() {
   return (
     <article className="post-card">
