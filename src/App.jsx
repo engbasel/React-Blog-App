@@ -9,6 +9,7 @@ import AddPost from "./features/posts/AddPost.jsx";
 import About from "./features/about/About.jsx";
 import Register from "./features/auth/Register.jsx";
 import PageNotFound from "./features/about/PangenotFound.jsx";
+import ProfileView from "./features/Profile/profileView.jsx";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<About />} />
           <Route path="/add" element={<AddPost />} />
+          <Route path="/profile" element={<ProfileView />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </div>
