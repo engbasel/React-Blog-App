@@ -4,12 +4,26 @@ import "./AddPost.css"; // استدعاء ملف css
 export default function AddPost() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]; // أول صورة يختارها
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file)); 
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log({ title, description, image });
-    // هنا هتعمل إضافة البوست (API أو state)
+
+    console.log({
+      title,
+      description,
+      image, 
+    });
+
   };
 
   return (
@@ -33,12 +47,18 @@ export default function AddPost() {
         ></textarea>
 
         <input
-          type="text"
-          placeholder="Image URL"
-          value={image}
-          onChange={(e) => setImage(e.target.value)}
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
           className="addpost-input"
         />
+
+          {preview && (
+          <div className="preview">
+            <p>Image Preview:</p>
+            <img src={preview} alt="preview" className="preview-img" />
+          </div>
+        )}
 
         <button type="submit" className="addpost-button">
           Add Post
