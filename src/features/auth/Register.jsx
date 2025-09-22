@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth} from "../../../firebase/config.js";
+import InputField from "../../components/InputField.jsx";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -43,37 +44,14 @@ export default function Register() {
       <form className="auth-card" onSubmit={handleSubmit}>
         <h2>Register</h2>
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+        <InputField   type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <InputField   type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <InputField   type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
 
-        <input
-          type="password"
-          placeholder="Confirm password"
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          required
-        />
+<InputField   type="password" placeholder="Confirm password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
+
 
         <button type="submit" className="auth-btn">Register</button>
 

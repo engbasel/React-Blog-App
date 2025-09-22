@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
+import InputField from "../../components/InputField";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,7 +11,6 @@ export default function Login() {
   function handleSubmit(e) {
     e.preventDefault();
 
-    // جرب نجيب المستخدم من localStorage (لو مسجل من صفحة Register)
     const saved = JSON.parse(localStorage.getItem("blog_user"));
     if (!saved) {
       alert("No user found. Please register first.");
@@ -22,9 +22,7 @@ export default function Login() {
       return;
     }
 
-    // علامة تسجيل الدخول - نخزن اسم المستخدم كـ session بسيطة
     localStorage.setItem("blog_logged_in", JSON.stringify({ name: saved.name, email: saved.email }));
-    // redirect للصفحة الرئيسية
     navigate("/");
   }
 
@@ -32,20 +30,25 @@ export default function Login() {
     <div className="auth-page">
       <form className="auth-card" onSubmit={handleSubmit}>
         <h2>Login</h2>
-        <input
+        {/* <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <input
+         */}
+
+<InputField type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+
+<InputField type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        {/* <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-        />
+        /> */}
         <button type="submit" className="auth-btn">Login</button>
 
         <p className="small">
