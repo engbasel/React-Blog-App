@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./AddPost.css"; 
+import { db } from "../../../firebase/config"; 
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function AddPost() {
   const [title, setTitle] = useState("");
@@ -15,16 +17,29 @@ export default function AddPost() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log({
-      title,
-      description,
-      image, 
-    });
-
+  
+    try {
+      // نضيف الداتا في collection اسمه "posts"
+      await addDoc(collection(db, "posts"), {
+        title,
+        description,
+        image,
+        createdAt: serverTimestamp(), // timestamp من السيرفر
+      });
+  
+      alert("Post added successfully ✅");
+      // ممكن بعد كده تعمل reset للـ inputs
+      setTitle("");
+      setDescription("");
+      setImage("");
+    } catch (error) {
+      console.error("Error adding post: ", error);
+      alert("Failed to add post ❌");
+    }
   };
+  
 
   return (
     <div className="addpost-container">
