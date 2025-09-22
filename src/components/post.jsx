@@ -7,7 +7,7 @@ export default function Post() {
       <div className="post-image-wrap">
         <img
           className="post-image"
-          src="https://via.placeholder.com/600x300.png?text=Post+Image"
+          src="https://media.istockphoto.com/id/814423752/photo/eye-of-model-with-colorful-art-make-up-close-up.jpg?s=612x612&w=0&k=20&c=l15OdMWjgCKycMMShP8UK94ELVlEGvt7GmB_esHWPYE="
           alt="Post"
         />
       </div>
@@ -23,7 +23,7 @@ export default function Post() {
           <div className="author">
             <img
               className="author-avatar"
-              src="https://via.placeholder.com/40.png?text=U"
+              src="https://media.istockphoto.com/id/814423752/photo/eye-of-model-with-colorful-art-make-up-close-up.jpg?s=612x612&w=0&k=20&c=l15OdMWjgCKycMMShP8UK94ELVlEGvt7GmB_esHWPYE="
               alt="Author"
             />
             <div className="author-info">

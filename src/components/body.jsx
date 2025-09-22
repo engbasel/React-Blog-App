@@ -1,7 +1,7 @@
 import React from 'react'
 import Post from './post'
 
-export default function body() {
+export default function Body() {
   return (
     <div>
         <Post/>
