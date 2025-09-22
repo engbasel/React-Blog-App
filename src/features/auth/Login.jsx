@@ -13,7 +13,7 @@ export default function Login() {
   function handleLogin(e) { 
     e.preventDefault();
 
-signInWithEmailAndPassword(auth,email,password)
+auth.signInWithEmailAndPassword(email,password)
 .then((userCredential) => {
   const user = userCredential.user;
   console.log(user);
