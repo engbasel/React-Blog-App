@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth} from "../../../firebase/config.js";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -9,9 +11,11 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
 
-  function handleSubmit(e) {
-    e.preventDefault();
 
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+  
     if (!name.trim() || !email.trim() || !password) {
       alert("Please fill all fields.");
       return;
@@ -20,17 +24,19 @@ export default function Register() {
       alert("Passwords do not match.");
       return;
     }
-
-    // نخزن المستخدم في localStorage كبساطة للتجربة
-    const user = { name: name.trim(), email: email.trim(), password };
-    localStorage.setItem("blog_user", JSON.stringify(user));
-
-    // نخلي المستخدم مسجل مباشرة بعد التسجيل
-    localStorage.setItem("blog_logged_in", JSON.stringify({ name: user.name, email: user.email }));
-
-    // redirect للصفحة الرئيسية
-    navigate("/");
+  
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  
+      console.log("User created:", userCredential.user);
+  
+      navigate("/");
+    } catch (error) {
+      console.error("Error registering:", error.message);
+      alert(error.message);
+    }
   }
+  
 
   return (
     <div className="auth-page">
