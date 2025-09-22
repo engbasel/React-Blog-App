@@ -1,3 +1,13 @@
+// ### 🏠 Home Page
+
+// - Navbar at the top
+// - List of posts, each post should have:
+//     - 🖼️ Image
+//     - 📝 Title
+//     - 📄 Description
+//     - ✍️ Author name
+// - Header should include a link to the **Login/Register** page
+
 import React from "react";
 import "./Post.css"; // لو هتحط CSS في ملف منفصل
 
@@ -41,3 +51,4 @@ export default function Post() {
     </article>
   );
 }
+// 

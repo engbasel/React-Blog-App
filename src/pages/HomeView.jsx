@@ -1,10 +1,11 @@
 import React from 'react'
-import Body from '../components/body'
+import Post from '../components/post'
 
 export default function Home() {
   return (
     <div>
-        <Body/>
-    </div>
+        <Post/>
+        <Post/>
+        <Post/>    </div>
   )
 }
