@@ -1,23 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Navbar.css";
-import { auth } from "../../firebase/config";
+import { auth, db } from "../../firebase/config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser); // بيكون null لو عملت logout
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        // 🟢 جيب بياناته من Firestore
+        const docRef = doc(db, "users", currentUser.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setUser({ uid: currentUser.uid, ...docSnap.data() });
+        } else {
+          setUser(currentUser); // fallback لو مفيش document
+        }
+      } else {
+        setUser(null);
+      }
     });
 
     return () => unsubscribe();
   }, []);
 
   const handleLogout = async () => {
-    await signOut(auth); // 🟢 تسجيل خروج
+    await signOut(auth);
   };
 
   return (
@@ -55,7 +68,11 @@ export default function Navbar() {
                     className="nav-user" 
                     onClick={() => setOpen(false)}
                   >
-                    👤 {user.displayName || user.email}
+                    <img
+                      src={user.photoURL || "/default-avatar.png"}
+                      alt="user avatar"
+                      className="nav-avatar"
+                    />
                   </Link>
                 </li>
                 <li>

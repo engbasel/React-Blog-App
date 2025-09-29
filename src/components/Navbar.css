@@ -111,6 +111,14 @@
   transition: transform 0.3s, opacity 0.3s;
 }
 
+.nav-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffd166;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .nav-toggle {
