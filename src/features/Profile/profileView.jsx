@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { auth, db, storage } from "../../../firebase/config";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { onAuthStateChanged, signOut } from "firebase/auth"; // 🟢 أضفت signOut هنا
 import "./ProfileView.css";
-import { onAuthStateChanged } from "firebase/auth";
 
 export default function ProfileView() {
   const [profile, setProfile] = useState(null);
@@ -35,10 +35,9 @@ export default function ProfileView() {
       }
       setLoading(false);
     });
-  
     return () => unsubscribe();
   }, []);
-  
+
   const handleImageUpload = async (file) => {
     if (!file) return;
     setUploading(true);
@@ -71,6 +70,16 @@ export default function ProfileView() {
     }
   };
 
+  // 🟢 دالة تسجيل الخروج
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (err) {
+      console.error("❌ Error logging out:", err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="profile-loading">
@@ -90,10 +99,7 @@ export default function ProfileView() {
   return (
     <div className="profile-container">
       <div className="profile-card">
-        {/* Cover */}
         <div className="profile-cover"></div>
-
-        {/* Avatar */}
         <div className="profile-avatar">
           <img
             src={profile.photoURL || "https://via.placeholder.com/150"}
@@ -101,7 +107,6 @@ export default function ProfileView() {
           />
         </div>
 
-        {/* Info */}
         <div className="profile-info">
           <h2>{profile.name || "Unknown User"}</h2>
           <p className="email">{profile.email}</p>
@@ -118,19 +123,17 @@ export default function ProfileView() {
             {profile.location && <p>📍 {profile.location}</p>}
           </div>
 
-          {/* Actions */}
           <div className="actions">
             <button className="btn edit" onClick={() => setEditing(true)}>
               Edit Profile
             </button>
-            <button className="btn logout" onClick={() => navigate("/login")}>
+            <button className="btn logout" onClick={handleLogout}>
               Logout
             </button>
           </div>
         </div>
       </div>
 
-      {/* Modal Edit */}
       {editing && (
         <div className="modal-overlay">
           <div className="modal">

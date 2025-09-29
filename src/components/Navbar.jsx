@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Navbar.css";
-import { auth } from "../../firebase/config"; // استدعاء auth من Firebase
+import { auth } from "../../firebase/config";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
 
-  // نتابع حالة اليوزر باستخدام onAuthStateChanged
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else {
-        setUser(null);
-      }
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser); // بيكون null لو عملت logout
     });
 
     return () => unsubscribe();
   }, []);
+
+  const handleLogout = async () => {
+    await signOut(auth); // 🟢 تسجيل خروج
+  };
 
   return (
     <header className="navbar">
@@ -48,18 +48,25 @@ export default function Navbar() {
             </li>
 
             {user ? (
-              <li>
-
-
-<Link 
-      to="/profile" 
-      className="nav-user" 
-      onClick={() => setOpen(false)}
-    >
-      👤 {user.displayName || user.email}
-    </Link>
-
-              </li>
+              <>
+                <li>
+                  <Link 
+                    to="/profile" 
+                    className="nav-user" 
+                    onClick={() => setOpen(false)}
+                  >
+                    👤 {user.displayName || user.email}
+                  </Link>
+                </li>
+                <li>
+                  <button 
+                    onClick={handleLogout} 
+                    className="btn-logout"
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
             ) : (
               <li>
                 <Link
