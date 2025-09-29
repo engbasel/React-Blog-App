@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import "./AddPost.css"; 
-import { db } from "../../../firebase/config"; 
+import { db } from "../../../firebase/config";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import "./AddPost.css"; // هنا ربطنا ملف الـ CSS
 
 export default function AddPost() {
   const [title, setTitle] = useState("");
@@ -10,73 +10,73 @@ export default function AddPost() {
   const [preview, setPreview] = useState(null);
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0]; 
+    const file = e.target.files[0];
     if (file) {
       setImage(file);
-      setPreview(URL.createObjectURL(file)); 
+      setPreview(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      // نضيف الداتا في collection اسمه "posts"
       await addDoc(collection(db, "posts"), {
         title,
         description,
         image,
-        createdAt: serverTimestamp(), // timestamp من السيرفر
+        createdAt: serverTimestamp(),
       });
-  
+
       alert("Post added successfully ✅");
-      // ممكن بعد كده تعمل reset للـ inputs
       setTitle("");
       setDescription("");
-      setImage("");
+      setImage(null);
+      setPreview(null);
     } catch (error) {
       console.error("Error adding post: ", error);
       alert("Failed to add post ❌");
     }
   };
-  
 
   return (
     <div className="addpost-container">
-      <form className="addpost-form" onSubmit={handleSubmit}>
-        <h2 className="addpost-title">New Post</h2>
+      <form onSubmit={handleSubmit} className="addpost-form">
+        <h2 className="addpost-title">Create a Post</h2>
 
         <input
           type="text"
-          placeholder="Title"
+          placeholder="Post Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="addpost-input"
         />
 
         <textarea
-          placeholder="Description"
+          placeholder="What's on your mind?"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          rows={4}
           className="addpost-textarea"
         ></textarea>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="addpost-input"
-        />
+        <label className="addpost-upload">
+          <span>Upload an image</span>
+          <input type="file" accept="image/*" onChange={handleImageChange} />
+          <div className="upload-box">
+            {image ? image.name : "Click to choose an image"}
+          </div>
+        </label>
 
-          {preview && (
-          <div className="preview">
-            <p>Image Preview:</p>
-            <img src={preview} alt="preview" className="preview-img" />
+        {preview && (
+          <div className="addpost-preview">
+            <p>Preview:</p>
+            <img src={preview} alt="preview" />
           </div>
         )}
 
         <button type="submit" className="addpost-button">
-          Add Post
+          Post
         </button>
       </form>
     </div>
