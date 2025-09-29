@@ -8,7 +8,15 @@ import InputField from "../../components/InputField.jsx";
 
 export default function Register() {
   const navigate = useNavigate();
+
+  // 📝 بيانات البروفايل
   const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+  const [photoURL, setPhotoURL] = useState("");
+  const [phone, setPhone] = useState("");
+  const [location, setLocation] = useState("");
+
+  // 📝 بيانات الحساب
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -16,36 +24,37 @@ export default function Register() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    console.log("📩 Submitting register form:", { name, email, password, confirm });
-
     if (!name.trim() || !email.trim() || !password) {
-      console.warn("⚠️ Missing fields");
-      alert("Please fill all fields.");
+      alert("⚠️ Please fill all required fields.");
       return;
     }
 
     if (password !== confirm) {
-      console.warn("⚠️ Passwords mismatch");
-      alert("Passwords do not match.");
+      alert("⚠️ Passwords do not match.");
       return;
     }
 
     try {
-      console.log("⏳ Creating user in Firebase Auth...");
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // ✨ إنشاء يوزر في Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
 
-      console.log("✅ User created in Auth:", user);
-
-      // 🔥 Save user data in Firestore
-      console.log("⏳ Saving user profile in Firestore...");
+      // ✨ حفظ البيانات في Firestore
       await setDoc(doc(db, "users", user.uid), {
         name: name.trim(),
         email: user.email,
+        bio: bio.trim() || "New user on our platform 🚀",
+        photoURL:
+          photoURL.trim() ||
+          "https://via.placeholder.com/150", // صورة افتراضية
+        phone: phone.trim() || "",
+        location: location.trim() || "",
         createdAt: serverTimestamp(),
       });
-
-      console.log("✅ User profile saved in Firestore with UID:", user.uid);
 
       navigate("/profile");
     } catch (error) {
@@ -59,9 +68,10 @@ export default function Register() {
       <form className="auth-card" onSubmit={handleSubmit}>
         <h2>Register</h2>
 
+        {/* بيانات أساسية */}
         <InputField
           type="text"
-          placeholder="Name"
+          placeholder="Full Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
@@ -85,11 +95,41 @@ export default function Register() {
 
         <InputField
           type="password"
-          placeholder="Confirm password"
+          placeholder="Confirm Password"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           required
         />
+
+        {/* بيانات إضافية للبروفايل */}
+        <InputField
+          type="text"
+          placeholder="Photo URL (optional)"
+          value={photoURL}
+          onChange={(e) => setPhotoURL(e.target.value)}
+        />
+
+        <InputField
+          type="text"
+          placeholder="Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
+
+        <InputField
+          type="text"
+          placeholder="Location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        />
+
+        <textarea
+          className="auth-textarea"
+          placeholder="Bio"
+          value={bio}
+          onChange={(e) => setBio(e.target.value)}
+          rows="3"
+        ></textarea>
 
         <button type="submit" className="auth-btn">
           Register
