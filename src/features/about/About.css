@@ -1,0 +1,85 @@
+.about-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 25px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    font-family: "Segoe UI", sans-serif;
+    line-height: 1.6;
+  }
+  
+  .about-container h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #222;
+  }
+  
+  .intro {
+    font-size: 17px;
+    color: #444;
+    margin-bottom: 30px;
+    text-align: center;
+  }
+  
+  .about-section {
+    margin-bottom: 30px;
+  }
+  
+  .about-section h2 {
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .about-section ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .about-section ul li {
+    background: #f9f9f9;
+    margin-bottom: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  
+  .profile-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #fdfdfd;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .profile-card h3 {
+    margin: 0;
+    color: #111;
+  }
+  
+  .profile-card p {
+    margin: 5px 0;
+    color: #555;
+  }
+  
+  .links a {
+    margin-right: 15px;
+    text-decoration: none;
+    font-size: 14px;
+    color: #0077b5;
+    font-weight: bold;
+  }
+  
+  .links a:hover {
+    text-decoration: underline;
+  }
+  
