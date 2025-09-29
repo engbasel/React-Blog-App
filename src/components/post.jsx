@@ -3,7 +3,7 @@
 // - Navbar at the top
 // - List of posts, each post should have:
 //     - 🖼️ Image
-//     - 📝 Title
+//     -  Title
 //     - 📄 Description
 //     - ✍️ Author name
 // - Header should include a link to the **Login/Register** page
