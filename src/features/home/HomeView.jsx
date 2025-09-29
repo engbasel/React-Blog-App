@@ -4,6 +4,7 @@ import AddButton from "../../components/addbuttom";
 import { db } from "../../../firebase/config";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import PostCard from "../../features/home/PostCard"; // 👈 استدعاء الكارد
+import NoPosts from "./NoPosts";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -35,7 +36,7 @@ export default function Home() {
       </h1>
 
       {posts.length === 0 ? (
-        <p className="text-center text-gray-500">No posts yet 🚀</p>
+<NoPosts/>        // <p className="text-center text-gray-500">No posts yet 🚀</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
