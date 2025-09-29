@@ -5,6 +5,7 @@ import { auth, db, storage } from "../../../firebase/config";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "./ProfileView.css";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function ProfileView() {
   const [profile, setProfile] = useState(null);
@@ -15,31 +16,29 @@ export default function ProfileView() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchUserProfile() {
-      const user = auth.currentUser;
-      if (!user) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          setProfile({ ...docSnap.data(), email: user.email });
-          setFormData({ ...docSnap.data(), email: user.email });
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setProfile({ ...docSnap.data(), email: user.email });
+            setFormData({ ...docSnap.data(), email: user.email });
+          } else {
+            console.log("⚠️ No profile data found in Firestore");
+          }
+        } catch (err) {
+          console.error("❌ Error fetching profile:", err);
         }
-      } catch (err) {
-        console.error("❌ Error fetching profile:", err);
-      } finally {
-        setLoading(false);
+      } else {
+        setProfile(null);
       }
-    }
-
-    fetchUserProfile();
+      setLoading(false);
+    });
+  
+    return () => unsubscribe();
   }, []);
-
+  
   const handleImageUpload = async (file) => {
     if (!file) return;
     setUploading(true);
