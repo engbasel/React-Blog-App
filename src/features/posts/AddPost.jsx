@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { db, storage, auth } from "../../../firebase/config";
-import { addDoc, collection, serverTimestamp, doc, getDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { toast } from "react-toastify";
 
 import "./AddPost.css";
 
@@ -25,7 +32,6 @@ function AddPost() {
         imageUrl = await getDownloadURL(storageRef);
       }
 
-      // ✅ get current user from Auth
       const user = auth.currentUser;
       if (!user) {
         alert("⚠️ Please login first!");
@@ -33,7 +39,6 @@ function AddPost() {
         return;
       }
 
-      // ✅ fetch full profile from Firestore
       const userDocRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
 
@@ -47,22 +52,22 @@ function AddPost() {
         desc,
         image: imageUrl,
         createdAt: serverTimestamp(),
-        // 🟢 get user info from Firestore first, fallback to Auth
         author: profileData.name || user.displayName || "Unknown User",
         authorId: user.uid,
         authorEmail: user.email,
         authorAvatar:
-          profileData.photoURL ||
-          user.photoURL ||
-          "/default-avatar.png",
+          profileData.photoURL || user.photoURL || "/default-avatar.png",
       });
 
-      alert("✅ Post added successfully!");
+      toast.success(" Post added successfully!");
       setTitle("");
       setDesc("");
       setImage(null);
       setPreview(null);
+
     } catch (err) {
+      toast.error("Post not added try again ");
+
       console.error("❌ Error adding post: ", err);
     } finally {
       setLoading(false);
@@ -91,8 +96,9 @@ function AddPost() {
           required
         />
 
-        <label className="addpost-upload">
-          Upload Image
+        {/* Upload Box */}
+        <label className="upload-box">
+          <span>📷 Click to Upload Image</span>
           <input
             type="file"
             accept="image/*"
@@ -106,12 +112,13 @@ function AddPost() {
 
         {preview && (
           <div className="addpost-preview">
+            <p>🖼️ Preview</p>
             <img src={preview} alt="preview" />
           </div>
         )}
 
         <button type="submit" className="addpost-button" disabled={loading}>
-          {loading ? "Uploading..." : "Add Post"}
+          {loading ? "Uploading..." : "Publish Post 🚀"}
         </button>
       </form>
     </div>
