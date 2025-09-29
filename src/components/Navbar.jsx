@@ -49,9 +49,16 @@ export default function Navbar() {
 
             {user ? (
               <li>
-                <span className="nav-user">
-                  👤 {user.displayName || user.email}
-                </span>
+
+
+<Link 
+      to="/profile" 
+      className="nav-user" 
+      onClick={() => setOpen(false)}
+    >
+      👤 {user.displayName || user.email}
+    </Link>
+
               </li>
             ) : (
               <li>
