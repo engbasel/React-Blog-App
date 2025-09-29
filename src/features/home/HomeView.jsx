@@ -32,8 +32,7 @@ export default function Home() {
 
   return (
     <div className="p-6 min-h-screen bg-gray-50">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-recently Posts      </h1>
+      
 
       {posts.length === 0 ? (
 <NoPosts/>        // <p className="text-center text-gray-500">No posts yet 🚀</p>
