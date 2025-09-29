@@ -10,10 +10,13 @@ import About from "./features/about/About.jsx";
 import Register from "./features/auth/Register.jsx";
 import PageNotFound from "./features/about/PangenotFound.jsx";
 import ProfileView from "./features/Profile/profileView.jsx";
-
+import { ToastContainer } from "react-toastify";
 export default function App() {
   return (
     <>
+
+<ToastContainer position="top-center" autoClose={3000} />
+
       <Navbar />
       <div className="page-container">
         <Routes>
