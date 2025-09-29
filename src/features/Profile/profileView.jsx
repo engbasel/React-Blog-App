@@ -202,7 +202,15 @@ export default function ProfileView() {
         </div>
       </div>
 
-      {/* 🟢 Posts Section */}
+      <div className="actions">
+ 
+  <button className="btn edit" onClick={() => navigate("/MyPosts")}>
+    View My Posts
+  </button>
+</div>
+
+
+      {/* 🟢 Posts Section
       <div className="posts-section">
         <h2>📝 My Posts</h2>
         {posts.length === 0 ? (
@@ -229,7 +237,7 @@ export default function ProfileView() {
             </div>
           ))
         )}
-      </div>
+      </div> */}
 
       {/* 🟢 Edit Post Modal */}
       {postEditing && (

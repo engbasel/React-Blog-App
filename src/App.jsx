@@ -11,6 +11,7 @@ import Register from "./features/auth/Register.jsx";
 import PageNotFound from "./features/about/PangenotFound.jsx";
 import ProfileView from "./features/Profile/profileView.jsx";
 import { ToastContainer } from "react-toastify";
+import MyPosts from "./features/Profile/MyPosts.jsx";
 export default function App() {
   return (
     <>
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/add" element={<AddPost />} />
           <Route path="/profile" element={<ProfileView />} />
+          <Route path="/MyPosts" element={<MyPosts />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </div>
