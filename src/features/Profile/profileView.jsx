@@ -1,8 +1,10 @@
+// ProfileView.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db, storage } from "../../../firebase/config";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import "./ProfileView.css";
 
 export default function ProfileView() {
   const [profile, setProfile] = useState(null);
@@ -72,49 +74,41 @@ export default function ProfileView() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <p className="text-lg font-medium text-gray-600 animate-pulse">
-          ⏳ Loading profile...
-        </p>
+      <div className="profile-loading">
+        <p>⏳ Loading profile...</p>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-50">
-        <p className="text-lg font-medium text-gray-600">
-          ⚠️ No profile data found!
-        </p>
+      <div className="profile-loading">
+        <p>⚠️ No profile data found!</p>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
-      <div className="w-full max-w-md bg-white shadow-xl rounded-2xl overflow-hidden">
-        {/* Cover / Banner */}
-        <div className="h-32 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+    <div className="profile-container">
+      <div className="profile-card">
+        {/* Cover */}
+        <div className="profile-cover"></div>
 
         {/* Avatar */}
-        <div className="flex justify-center -mt-16 relative">
+        <div className="profile-avatar">
           <img
             src={profile.photoURL || "https://via.placeholder.com/150"}
             alt="profile"
-            className="rounded-full w-32 h-32 object-cover border-4 border-white shadow-md"
           />
         </div>
 
         {/* Info */}
-        <div className="px-6 pb-6 text-center">
-          <h2 className="text-2xl font-bold mt-4 text-gray-800">
-            {profile.name || "Unknown User"}
-          </h2>
-          <p className="text-gray-500">{profile.email}</p>
+        <div className="profile-info">
+          <h2>{profile.name || "Unknown User"}</h2>
+          <p className="email">{profile.email}</p>
+          <p className="bio">{profile.bio || "No bio yet..."}</p>
 
-          <p className="mt-3 text-gray-600">{profile.bio || "No bio yet..."}</p>
-
-          <div className="mt-4 text-sm text-gray-400">
+          <div className="details">
             <p>
               📅 Joined:{" "}
               {auth.currentUser?.metadata?.creationTime
@@ -126,80 +120,63 @@ export default function ProfileView() {
           </div>
 
           {/* Actions */}
-          <div className="flex justify-center gap-4 mt-6">
-            <button
-              onClick={() => setEditing(true)}
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
-            >
+          <div className="actions">
+            <button className="btn edit" onClick={() => setEditing(true)}>
               Edit Profile
             </button>
-            <button
-             onClick={() => navigate('/login')}
-            className="px-4 py-2 rounded-lg border border-red-500 text-red-500 font-medium hover:bg-red-50 transition">
+            <button className="btn logout" onClick={() => navigate("/login")}>
               Logout
-
             </button>
           </div>
         </div>
       </div>
 
-      {/* Modal Edit Profile */}
+      {/* Modal Edit */}
       {editing && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">✏️ Edit Profile</h2>
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>✏️ Edit Profile</h2>
 
             <input
               type="text"
               placeholder="Name"
               value={formData.name || ""}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full border rounded-lg p-2 mb-3"
             />
             <textarea
               placeholder="Bio"
               value={formData.bio || ""}
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-              className="w-full border rounded-lg p-2 mb-3"
             />
             <input
               type="text"
               placeholder="Phone"
               value={formData.phone || ""}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full border rounded-lg p-2 mb-3"
             />
             <input
               type="text"
               placeholder="Location"
               value={formData.location || ""}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              className="w-full border rounded-lg p-2 mb-3"
             />
 
-            <label className="block mb-3">
+            <label>
               Upload Avatar:
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) => handleImageUpload(e.target.files[0])}
-                className="block mt-2"
               />
             </label>
 
-            {uploading && <p className="text-sm text-blue-500">Uploading...</p>}
+            {uploading && <p className="uploading">Uploading...</p>}
 
-            <div className="flex justify-end gap-3 mt-4">
-              <button
-                onClick={() => setEditing(false)}
-                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
-              >
+            <div className="modal-actions">
+              <button className="btn cancel" onClick={() => setEditing(false)}>
                 Cancel
               </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
-              >
+              <button className="btn save" onClick={handleSave}>
                 Save
               </button>
             </div>
