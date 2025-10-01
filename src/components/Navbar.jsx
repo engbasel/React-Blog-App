@@ -3,30 +3,49 @@ import { Link } from "react-router-dom";
 import "./Navbar.css";
 import { auth, db } from "../../firebase/config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        // 🟢 جيب بياناته من Firestore
-        const docRef = doc(db, "users", currentUser.uid);
-        const docSnap = await getDoc(docRef);
+    let unsubscribeUserDoc = null;
 
-        if (docSnap.exists()) {
-          setUser({ uid: currentUser.uid, ...docSnap.data() });
-        } else {
-          setUser(currentUser); // fallback لو مفيش document
-        }
+    const unsubscribeAuth = onAuthStateChanged(auth, (currentUser) => {
+      // Cleanup previous user doc listener if any
+      if (unsubscribeUserDoc) {
+        unsubscribeUserDoc();
+        unsubscribeUserDoc = null;
+      }
+
+      if (currentUser) {
+        const docRef = doc(db, "users", currentUser.uid);
+        // Subscribe to realtime updates of the user document
+        unsubscribeUserDoc = onSnapshot(
+          docRef,
+          (docSnap) => {
+            if (docSnap.exists()) {
+              setUser({ uid: currentUser.uid, ...docSnap.data() });
+            } else {
+              // Fallback if no user document
+              setUser(currentUser);
+            }
+          },
+          () => {
+            // On error, still fallback to auth user
+            setUser(currentUser);
+          }
+        );
       } else {
         setUser(null);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribeUserDoc) unsubscribeUserDoc();
+      unsubscribeAuth();
+    };
   }, []);
 
   const handleLogout = async () => {
