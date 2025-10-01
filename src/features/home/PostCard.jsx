@@ -1,10 +1,10 @@
-
 import React from "react";
-import "./PostCard.css"; // 👈 استدعاء ملف CSS
+import { Link } from "react-router-dom";
+import "./PostCard.css"; // 
 
 export default function PostCard({ post }) {
   return (
-    <div className="post-card">
+    <Link to={`/posts/${post.id}`} className="post-card" style={{ display: "block", cursor: "pointer" }}>
       {post.image && (
         <div className="post-image-wrapper">
           <img
@@ -41,6 +41,6 @@ export default function PostCard({ post }) {
             : "Unknown"}
         </span>
       </div>
-    </div>
+    </Link>
   );
 }

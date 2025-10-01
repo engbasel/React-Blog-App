@@ -12,6 +12,7 @@ import PageNotFound from "./features/about/PangenotFound.jsx";
 import ProfileView from "./features/Profile/profileView.jsx";
 import { ToastContainer } from "react-toastify";
 import MyPosts from "./features/Profile/MyPosts.jsx";
+import PostDetails from "./features/posts/PostDetails.jsx";
 export default function App() {
   return (
     <>
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/add" element={<AddPost />} />
           <Route path="/profile" element={<ProfileView />} />
           <Route path="/MyPosts" element={<MyPosts />} />
+          <Route path="/posts/:id" element={<PostDetails />} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </div>
