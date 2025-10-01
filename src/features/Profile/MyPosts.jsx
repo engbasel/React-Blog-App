@@ -12,6 +12,7 @@ export default function MyPosts() {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ title: "", desc: "" });
   const navigate = useNavigate();
+  const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -71,11 +72,14 @@ export default function MyPosts() {
     }
   };
 
-  const removePost = async (id) => {
-    if (!window.confirm("Delete this post?")) return;
+  // Delete confirmation modal logic
+  const openDeleteConfirm = (id) => setDeleteId(id);
+  const cancelDelete = () => setDeleteId(null);
+  const confirmDelete = async () => {
     try {
-      await deleteDoc(doc(db, "posts", id));
-      setPosts((prev) => prev.filter((p) => p.id !== id));
+      await deleteDoc(doc(db, "posts", deleteId));
+      setPosts((prev) => prev.filter((p) => p.id !== deleteId));
+      setDeleteId(null);
     } catch (e) {
       console.error("❌ Error deleting post:", e);
     }
@@ -84,37 +88,10 @@ export default function MyPosts() {
   return (
     <div className="myposts-container">
       {posts.length === 0 ? (
-        <section className="empty-posts" style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100vh",
-          backgroundColor: "#f9f9f9",
-          borderRadius: "16px",
-          boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
-        }}>
-          <h2 className="empty-title" style={{
-            fontSize: "24px",
-            fontWeight: "bold",
-            color: "#222",
-            marginBottom: "16px",
-          }}>No posts yet</h2>
-          <p className="empty-subtitle" style={{
-            fontSize: "18px",
-            color: "#444",
-            textAlign: "center",
-            maxWidth: "400px",
-          }}>Get started and create your own posts!</p>
-          <button className="add-post-btn" onClick={() => navigate("/add")} style={{
-            padding: "12px",
-            borderRadius: "8px",
-            border: "none",
-            backgroundColor: "#10b981",
-            color: "#fff",
-            fontWeight: "600",
-            cursor: "pointer",
-          }}>Add Post</button>
+        <section className="empty-posts">
+          <h2 className="empty-title">No posts yet</h2>
+          <p className="empty-subtitle">Get started and create your own posts!</p>
+          <button className="btn add-post-btn" onClick={() => navigate("/add")}>Add Post</button>
         </section>
       ) : (
         <div className="posts-grid">
@@ -131,9 +108,9 @@ export default function MyPosts() {
                 <h3>{post.title}</h3>
                 <p>{post.desc}</p>
                 <small>✍️ By {post.author}</small>
-                <div className="post-actions" style={{ marginTop: 8, display: "flex", gap: 8 }}>
+                <div className="post-actions">
                   <button className="btn edit" onClick={() => startEdit(post)}>Edit</button>
-                  <button className="btn delete" onClick={() => removePost(post.id)}>Delete</button>
+                  <button className="btn delete" onClick={() => openDeleteConfirm(post.id)}>Delete</button>
                 </div>
               </div>
             </div>
@@ -159,6 +136,19 @@ export default function MyPosts() {
             <div className="modal-actions">
               <button className="btn cancel" onClick={cancelEdit}>Cancel</button>
               <button className="btn save" onClick={saveEdit}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteId && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>🗑️ Delete this post?</h2>
+            <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+            <div className="modal-actions">
+              <button className="btn cancel" onClick={cancelDelete}>Cancel</button>
+              <button className="btn delete" onClick={confirmDelete}>Delete</button>
             </div>
           </div>
         </div>
