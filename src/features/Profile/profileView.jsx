@@ -15,6 +15,7 @@ import {
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import "./ProfileView.css";
+import Loader from "../home/Loader";
 
 export default function ProfileView() {
   const [profile, setProfile] = useState(null);
@@ -148,7 +149,7 @@ export default function ProfileView() {
   if (loading) {
     return (
       <div className="profile-loading">
-        <p>⏳ Loading profile...</p>
+        <Loader message="Loading profile..." />
       </div>
     );
   }
@@ -210,36 +211,8 @@ export default function ProfileView() {
 </div>
 
 
-      {/* 🟢 Posts Section
-      <div className="posts-section">
-        <h2>📝 My Posts</h2>
-        {posts.length === 0 ? (
-          <p>No posts yet.</p>
-        ) : (
-          posts.map((post) => (
-            <div key={post.id} className="post-card">
-              <h3>{post.title}</h3>
-              <p>{post.content}</p>
-              <div className="post-actions">
-                <button
-                  className="btn edit"
-                  onClick={() => handleEditPost(post)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn delete"
-                  onClick={() => handleDeletePost(post.id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div> */}
 
-      {/* 🟢 Edit Post Modal */}
+
       {postEditing && (
         <div className="modal-overlay">
           <div className="modal">
@@ -275,7 +248,6 @@ export default function ProfileView() {
         </div>
       )}
 
-      {/* 🟢 Edit Profile Modal */}
       {editing && (
         <div className="modal-overlay">
           <div className="modal">

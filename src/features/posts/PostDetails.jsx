@@ -4,6 +4,7 @@ import { db, auth, storage } from "../../../firebase/config";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "./PostDetails.css";
+import Loader from "../home/Loader";
 
 export default function PostDetails() {
   const { id } = useParams();
@@ -93,7 +94,7 @@ export default function PostDetails() {
     }
   };
 
-  if (loading) return <div className="loader-page">⏳ Loading post...</div>;
+  if (loading) return <Loader message="Loading post..." />;
   if (!post || error) return <div className="error-page">⚠️ {error || "Post not found"}</div>;
 
   const currentImage = newImage ? URL.createObjectURL(newImage) : post.image;
