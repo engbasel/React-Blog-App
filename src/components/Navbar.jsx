@@ -4,6 +4,7 @@ import "./Navbar.css";
 import { auth, db } from "../../firebase/config";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, onSnapshot } from "firebase/firestore";
+import defaultAvatar from "../../assets/imagenoone.jpg";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -88,9 +89,14 @@ export default function Navbar() {
                     onClick={() => setOpen(false)}
                   >
                     <img
-                      src={user.photoURL || "/default-avatar.png"}
+                      src={user.photoURL || defaultAvatar}
                       alt="user avatar"
                       className="nav-avatar"
+                      onError={(e) => {
+                        if (e.currentTarget.src !== defaultAvatar) {
+                          e.currentTarget.src = defaultAvatar;
+                        }
+                      }}
                     />
                   </Link>
                 </li>

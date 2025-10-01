@@ -28,7 +28,9 @@
 .post-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* الصورة ما تتقطعش */
+  object-fit: contain; /* اعرض الصورة كاملة */
+  object-position: center;
+  background: #f3f4f6; /* خلفية خفيفة للـ letterboxing */
   transition: transform 0.3s ease;
 }
 
