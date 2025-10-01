@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
@@ -13,12 +13,35 @@ import ProfileView from "./features/Profile/profileView.jsx";
 import { ToastContainer } from "react-toastify";
 import MyPosts from "./features/Profile/MyPosts.jsx";
 import PostDetails from "./features/posts/PostDetails.jsx";
+import Loader from "./features/home/Loader.jsx";
+import { auth } from "../firebase/config";
+import { onAuthStateChanged } from "firebase/auth";
 export default function App() {
+  const [authInitializing, setAuthInitializing] = useState(true);
+
+  useEffect(() => {
+    // Wait for the first auth state emission before rendering routes
+    const unsubscribe = onAuthStateChanged(auth, () => {
+      setAuthInitializing(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (authInitializing) {
+    return (
+      <>
+        <ToastContainer position="top-center" autoClose={3000} />
+        <Navbar />
+        <div className="page-container">
+          <Loader message="Initializing session..." />
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
-
-<ToastContainer position="top-center" autoClose={3000} />
-
+      <ToastContainer position="top-center" autoClose={3000} />
       <Navbar />
       <div className="page-container">
         <Routes>
