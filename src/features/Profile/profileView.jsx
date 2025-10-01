@@ -279,58 +279,72 @@ export default function ProfileView() {
       {editing && (
         <div className="modal-overlay">
           <div className="modal">
-            <h2>✏️ Edit Profile</h2>
+            <h2 className="modal-title">✏️ Edit Profile</h2>
 
-            <input
-              type="text"
-              placeholder="Name"
-              value={formData.name || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-            />
-            <textarea
-              placeholder="Bio"
-              value={formData.bio || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, bio: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Phone"
-              value={formData.phone || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
-            />
-            <input
-              type="text"
-              placeholder="Location"
-              value={formData.location || ""}
-              onChange={(e) =>
-                setFormData({ ...formData, location: e.target.value })
-              }
-            />
+            <div className="edit-form">
+              <div className="avatar-preview">
+                <img
+                  src={formData.photoURL || profile.photoURL || "https://via.placeholder.com/150"}
+                  alt="avatar preview"
+                />
+              </div>
 
-            <label>
-              Upload Avatar:
               <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleImageUpload(e.target.files[0])}
+                className="input-field"
+                type="text"
+                placeholder="Full Name"
+                value={formData.name || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
               />
-            </label>
+              <textarea
+                className="textarea-field"
+                placeholder="Bio"
+                value={formData.bio || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, bio: e.target.value })
+                }
+              />
+              <input
+                className="input-field"
+                type="text"
+                placeholder="Phone"
+                value={formData.phone || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
+              />
+              <input
+                className="input-field"
+                type="text"
+                placeholder="Location"
+                value={formData.location || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, location: e.target.value })
+                }
+              />
 
-            {uploading && <p className="uploading">Uploading...</p>}
+              <label className="image-upload-label">
+                <span className="label-text">Upload Avatar (optional)</span>
+                <input
+                  className="hidden-file-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e.target.files[0])}
+                />
+              </label>
 
-            <div className="modal-actions">
-              <button className="btn cancel" onClick={() => setEditing(false)}>
-                Cancel
-              </button>
-              <button className="btn save" onClick={handleSave}>
-                Save
-              </button>
+              {uploading && <p className="uploading">Uploading...</p>}
+
+              <div className="modal-actions">
+                <button className="btn cancel" onClick={() => setEditing(false)}>
+                  Cancel
+                </button>
+                <button className="btn save" onClick={handleSave}>
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         </div>

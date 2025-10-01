@@ -95,3 +95,101 @@
   padding: 6px 12px;
   border-radius: 6px;
 }
+
+/* ===== Edit Profile Modal ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: 100%;
+  max-width: 560px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  padding: 24px;
+}
+
+.modal-title {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.avatar-preview {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.avatar-preview img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e5e7eb;
+}
+
+.input-field,
+.textarea-field {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field:focus,
+.textarea-field:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+}
+
+.textarea-field {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.image-upload-label {
+  display: block;
+  background: #f9fafb;
+  padding: 12px;
+  border: 1px dashed #9ca3af;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #374151;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.label-text {
+  font-weight: 600;
+}
+
+.uploading {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
