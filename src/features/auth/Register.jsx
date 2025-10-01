@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Auth.css";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../../../firebase/config.js";
+import { auth, db, storage } from "../../../firebase/config.js";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import InputField from "../../components/InputField.jsx";
 
 export default function Register() {
@@ -12,7 +13,8 @@ export default function Register() {
   // 📝 بيانات البروفايل
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
-  const [photoURL, setPhotoURL] = useState("");
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
 
@@ -43,14 +45,20 @@ export default function Register() {
       );
       const user = userCredential.user;
 
+      // ✨ ارفع صورة البروفايل لو اختار صورة
+      let uploadedPhotoURL = "";
+      if (photoFile) {
+        const fileRef = ref(storage, `avatars/${user.uid}-${Date.now()}-${photoFile.name}`);
+        await uploadBytes(fileRef, photoFile);
+        uploadedPhotoURL = await getDownloadURL(fileRef);
+      }
+
       // ✨ حفظ البيانات في Firestore
       await setDoc(doc(db, "users", user.uid), {
         name: name.trim(),
         email: user.email,
         bio: bio.trim() || "New user on our platform 🚀",
-        photoURL:
-          photoURL.trim() ||
-          "https://via.placeholder.com/150", // صورة افتراضية
+        photoURL: uploadedPhotoURL || "",
         phone: phone.trim() || "",
         location: location.trim() || "",
         createdAt: serverTimestamp(),
@@ -101,13 +109,28 @@ export default function Register() {
           required
         />
 
-        {/* بيانات إضافية للبروفايل */}
-        <InputField
-          type="text"
-          placeholder="Photo URL (optional)"
-          value={photoURL}
-          onChange={(e) => setPhotoURL(e.target.value)}
-        />
+        {/* صورة البروفايل */}
+        <label className="image-upload-label" style={{ display: "block" }}>
+          <span className="label-text">Upload Avatar (optional)</span>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0] || null;
+              setPhotoFile(file);
+              setPhotoPreview(file ? URL.createObjectURL(file) : "");
+            }}
+          />
+          {photoPreview && (
+            <div style={{ marginTop: 10 }}>
+              <img
+                src={photoPreview}
+                alt="Preview"
+                style={{ width: 96, height: 96, borderRadius: "50%", objectFit: "cover", border: "2px solid #ddd" }}
+              />
+            </div>
+          )}
+        </label>
 
         <InputField
           type="text"
