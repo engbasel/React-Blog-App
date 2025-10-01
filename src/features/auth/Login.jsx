@@ -4,7 +4,7 @@ import "./Auth.css";
 import InputField from "../../components/InputField";
 import { auth } from "../../../firebase/config.js";
 import { signInWithEmailAndPassword } from "firebase/auth";
-
+import { toast } from "react-toastify";
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -22,7 +22,7 @@ export default function Login() {
       navigate("/");
     } catch (error) {
       console.error("❌ Error logging in:", error.code, error.message);
-      alert(error.message);
+      toast.error(error.message);
     }
   }
 

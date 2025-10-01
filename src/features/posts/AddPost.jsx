@@ -34,7 +34,7 @@ function AddPost() {
 
       const user = auth.currentUser;
       if (!user) {
-        alert("⚠️ Please login first!");
+              toast.error("⚠️ Please login first!");
         setLoading(false);
         return;
       }
