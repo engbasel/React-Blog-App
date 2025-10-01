@@ -3,17 +3,21 @@ import { useParams, useNavigate } from "react-router-dom";
 import { db, auth, storage } from "../../../firebase/config";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import "./PostDetails.css";
 
 export default function PostDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ title: "", desc: "" });
   const [newImage, setNewImage] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
+  // Load post data
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -22,9 +26,12 @@ export default function PostDetails() {
           const data = { id: snap.id, ...snap.data() };
           setPost(data);
           setForm({ title: data.title || "", desc: data.desc || "" });
+        } else {
+          setError("Post not found.");
         }
-      } catch (e) {
-        console.error("Error loading post", e);
+      } catch (err) {
+        console.error("Error fetching post:", err);
+        setError("Error loading post data.");
       } finally {
         setLoading(false);
       }
@@ -32,99 +39,155 @@ export default function PostDetails() {
     fetchPost();
   }, [id]);
 
-  const isAuthor = auth.currentUser && post && auth.currentUser.uid === post.authorId;
+  const isAuthor =
+    auth.currentUser && post && auth.currentUser.uid === post.authorId;
 
+  // Save post updates
   const handleSave = async () => {
     if (!post) return;
     setSaving(true);
+    setError(null);
     try {
       let imageUrl = post.image || "";
       if (newImage) {
+        // Upload new image
         const storageRef = ref(storage, `posts/${Date.now()}-${newImage.name}`);
         await uploadBytes(storageRef, newImage);
         imageUrl = await getDownloadURL(storageRef);
       }
-      await updateDoc(doc(db, "posts", post.id), {
+      
+      const updatedData = {
         title: form.title,
         desc: form.desc,
         image: imageUrl,
-      });
-      setPost((prev) => ({ ...prev, title: form.title, desc: form.desc, image: imageUrl }));
+      };
+
+      await updateDoc(doc(db, "posts", post.id), updatedData);
+      
+      // Update local state
+      setPost((prev) => ({
+        ...prev,
+        ...updatedData,
+      }));
       setEditing(false);
       setNewImage(null);
-    } catch (e) {
-      console.error("Error saving post", e);
+    } catch (err) {
+      console.error("Error saving post:", err);
+      setError("Failed to save post. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
+  // Delete post
   const handleDelete = async () => {
     if (!post) return;
-    if (!confirm("Are you sure you want to delete this post?")) return;
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    setError(null);
     try {
       await deleteDoc(doc(db, "posts", post.id));
       navigate("/");
-    } catch (e) {
-      console.error("Error deleting post", e);
+    } catch (err) {
+      console.error("Error deleting post:", err);
+      setError("Failed to delete post.");
     }
   };
 
-  if (loading) return <div className="p-6 text-center">⏳ Loading post...</div>;
-  if (!post) return <div className="p-6 text-center">⚠️ Post not found</div>;
+  if (loading) return <div className="loader-page">⏳ Loading post...</div>;
+  if (!post || error) return <div className="error-page">⚠️ {error || "Post not found"}</div>;
 
+  const currentImage = newImage ? URL.createObjectURL(newImage) : post.image;
+  
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      {post.image && (
-        <img src={post.image} alt={post.title} className="w-full rounded mb-4" />
-      )}
-      <h1 className="text-2xl font-bold mb-2">{post.title}</h1>
-      <p className="text-gray-700 mb-4">{post.desc}</p>
+    <div className="post-details-container">
+      {/* Display General Error */}
+      {error && <div className="general-error-message">{error}</div>}
 
-      <div className="flex items-center gap-3 text-sm text-gray-500 mb-6">
-        <img
-          src={post.authorAvatar || "/default-avatar.png"}
-          alt="avatar"
-          className="w-8 h-8 rounded-full"
-        />
-        <span>{post.author || "Anonymous"}</span>
-      </div>
+      <div className="post-details-card">
+        {/* Post Image & Title/Content Area */}
+        {editing ? (
+          <div className="edit-view">
+            {/* Image Preview (during editing) */}
+            <div className={`post-image-preview ${currentImage ? '' : 'no-image'}`}>
+              <img src={currentImage || "/default-placeholder.svg"} alt="Preview" />
+            </div>
 
-      {isAuthor && (
-        <div className="flex gap-2 mb-6">
-          <button className="btn edit" onClick={() => setEditing(true)}>Edit</button>
-          <button className="btn delete" onClick={handleDelete}>Delete</button>
-        </div>
-      )}
-
-      {editing && (
-        <div className="border rounded p-4 space-y-3">
-          <input
-            type="text"
-            className="w-full border p-2 rounded"
-            placeholder="Title"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-          />
-          <textarea
-            className="w-full border p-2 rounded"
-            placeholder="Description"
-            rows={5}
-            value={form.desc}
-            onChange={(e) => setForm({ ...form, desc: e.target.value })}
-          />
-          <label className="block">
-            <span className="mr-2">Change image (optional):</span>
-            <input type="file" accept="image/*" onChange={(e) => setNewImage(e.target.files?.[0] || null)} />
-          </label>
-          <div className="flex gap-2">
-            <button className="btn save" onClick={handleSave} disabled={saving}>
-              {saving ? "Saving..." : "Save"}
-            </button>
-            <button className="btn cancel" onClick={() => setEditing(false)}>Cancel</button>
+            {/* Edit Form */}
+            <div className="edit-form">
+                <input
+                  className="input-title"
+                  type="text"
+                  placeholder="Title"
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                />
+                <textarea
+                  className="textarea-desc"
+                  placeholder="Description"
+                  rows={8}
+                  value={form.desc}
+                  onChange={(e) => setForm({ ...form, desc: e.target.value })}
+                />
+                <label className="image-upload-label">
+                  <span className="label-text">Change Image (optional):</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) =>
+                      setNewImage(e.target.files?.[0] || null)
+                    }
+                  />
+                  {newImage && <span className="file-name">{newImage.name}</span>}
+                </label>
+                <div className="form-actions">
+                  <button className="btn btn-save" onClick={handleSave} disabled={saving}>
+                    {saving ? "💾 Saving..." : "💾 Save Changes"}
+                  </button>
+                  <button className="btn btn-cancel" onClick={() => setEditing(false)} disabled={saving}>
+                    ❌ Cancel
+                  </button>
+                </div>
+            </div>
           </div>
+        ) : (
+          <div className="read-view">
+            {/* Post Image */}
+            {post.image && (
+              <div className="post-image">
+                <img src={post.image} alt={post.title} />
+              </div>
+            )}
+
+            {/* Post Content */}
+            <div className="post-content">
+              <h1 className="post-title">{post.title}</h1>
+              <p className="post-description">{post.desc}</p>
+            </div>
+          </div>
+        )}
+        
+        {/* Author Info */}
+        <div className="author-info">
+          <img
+            src={post.authorAvatar || "/default-avatar.png"}
+            alt="Author Avatar"
+            className="author-avatar"
+          />
+          <span className="author-name">{post.author || "Anonymous"}</span>
         </div>
-      )}
+
+        {/* Actions for Author */}
+        {isAuthor && !editing && (
+          <div className="actions">
+            <button className="btn btn-edit" onClick={() => setEditing(true)}>
+              ✏️ Edit Post
+            </button>
+            <button className="btn btn-delete" onClick={handleDelete}>
+              🗑 Delete Post
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
