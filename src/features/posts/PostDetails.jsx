@@ -5,6 +5,7 @@ import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import "./PostDetails.css";
 import Loader from "../home/Loader";
+import ConfirmModal from "../../components/ConfirmModal";
 
 export default function PostDetails() {
   const { id } = useParams();
@@ -17,6 +18,8 @@ export default function PostDetails() {
   const [newImage, setNewImage] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Load post data
   useEffect(() => {
@@ -80,10 +83,16 @@ export default function PostDetails() {
     }
   };
 
-  // Delete post
-  const handleDelete = async () => {
+  // Delete post (open confirm modal)
+  const handleDelete = () => {
     if (!post) return;
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    setShowConfirm(true);
+  };
+
+  // Confirm deletion
+  const confirmDelete = async () => {
+    if (!post) return;
+    setDeleting(true);
     setError(null);
     try {
       await deleteDoc(doc(db, "posts", post.id));
@@ -91,6 +100,9 @@ export default function PostDetails() {
     } catch (err) {
       console.error("Error deleting post:", err);
       setError("Failed to delete post.");
+    } finally {
+      setDeleting(false);
+      setShowConfirm(false);
     }
   };
 
@@ -188,7 +200,33 @@ export default function PostDetails() {
             </button>
           </div>
         )}
+        <ConfirmModal
+          open={showConfirm}
+          title="Delete Post"
+          message="Are you sure you want to delete this post? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          busy={deleting}
+          onConfirm={confirmDelete}
+          onCancel={() => setShowConfirm(false)}
+        />
       </div>
     </div>
   );
 }
+
+const handleDelete = () => setShowConfirm(true);
+const confirmDelete = async () => {
+  if (!post) return;
+  setDeleting(true);
+  setError(null);
+  try {
+    await deleteDoc(doc(db, "posts", post.id));
+    navigate("/");
+  } catch (err) {
+    console.error("Error deleting post:", err);
+    setError("Failed to delete post.");
+  } finally {
+    setDeleting(false);
+    setShowConfirm(false);
+  }}
