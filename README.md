@@ -160,16 +160,7 @@ npm run lint     # Run ESLint
 
 ---
 
-## 📸 Screenshots
 
-Add screenshots to `public/` and embed here:
-
-```md
-![Home](public/screenshot-home.png)
-![Profile](public/screenshot-profile.png)
-```
-
----
 
 ## 🙏 Acknowledgements
 
