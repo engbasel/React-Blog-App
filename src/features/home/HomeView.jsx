@@ -5,6 +5,7 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import PostCard from "../../features/home/PostCard"; // استدعاء الكارد
 import NoPosts from "./NoPosts";
 import AddPostButton from "../../components/AddPostButton";
+import Loader from "./Loader";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -37,7 +38,7 @@ export default function Home() {
     <div className="p-6 min-h-screen bg-gray-50">
       
       {loading ? (
-        <div className="text-center text-gray-500 py-12">⏳ Loading posts...</div>
+        <Loader message="Loading posts..." />
       ) : posts.length === 0 ? (
         <NoPosts />
       ) : (
