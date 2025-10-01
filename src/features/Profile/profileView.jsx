@@ -15,6 +15,7 @@ import {
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import "./ProfileView.css";
+import "../posts/PostDetails.css";
 import Loader from "../home/Loader";
 
 export default function ProfileView() {
@@ -26,7 +27,9 @@ export default function ProfileView() {
 
   const [posts, setPosts] = useState([]);
   const [postEditing, setPostEditing] = useState(null); // post under edit
-  const [postForm, setPostForm] = useState({ title: "", content: "" });
+  const [postForm, setPostForm] = useState({ title: "", desc: "" });
+  const [postNewImage, setPostNewImage] = useState(null);
+  const [postSaving, setPostSaving] = useState(false);
 
   const navigate = useNavigate();
 
@@ -113,26 +116,44 @@ export default function ProfileView() {
   // 🟢 Edit post
   const handleEditPost = (post) => {
     setPostEditing(post.id);
-    setPostForm({ title: post.title, content: post.content });
+    // Map legacy 'content' to 'desc' for consistency with Home/PostDetails
+    setPostForm({ title: post.title || "", desc: post.desc ?? post.content ?? "" });
+    setPostNewImage(null);
   };
 
   // 🟢 Save edited post
   const handleSavePost = async () => {
     try {
+      setPostSaving(true);
       const docRef = doc(db, "posts", postEditing);
-      await updateDoc(docRef, {
+
+      // Determine final image: keep existing or upload new
+      const current = posts.find((p) => p.id === postEditing) || {};
+      let imageUrl = current.image || "";
+      if (postNewImage) {
+        const storageRef = ref(storage, `posts/${Date.now()}-${postNewImage.name}`);
+        await uploadBytes(storageRef, postNewImage);
+        imageUrl = await getDownloadURL(storageRef);
+      }
+
+      const updated = {
         title: postForm.title,
-        content: postForm.content,
-      });
+        desc: postForm.desc,
+        image: imageUrl,
+      };
+
+      await updateDoc(docRef, updated);
+
       setPosts((prev) =>
-        prev.map((p) =>
-          p.id === postEditing ? { ...p, ...postForm } : p
-        )
+        prev.map((p) => (p.id === postEditing ? { ...p, ...updated } : p))
       );
       setPostEditing(null);
-      setPostForm({ title: "", content: "" });
+      setPostForm({ title: "", desc: "" });
+      setPostNewImage(null);
     } catch (err) {
       console.error("❌ Error updating post:", err);
+    } finally {
+      setPostSaving(false);
     }
   };
 
@@ -216,33 +237,56 @@ export default function ProfileView() {
       {postEditing && (
         <div className="modal-overlay">
           <div className="modal">
-            <h2>✏️ Edit Post</h2>
-            <input
-              type="text"
-              placeholder="Title"
-              value={postForm.title}
-              onChange={(e) =>
-                setPostForm({ ...postForm, title: e.target.value })
-              }
-            />
-            <textarea
-              placeholder="Content"
-              value={postForm.content}
-              onChange={(e) =>
-                setPostForm({ ...postForm, content: e.target.value })
-              }
-            />
+            <h2 className="modal-title">✏️ Edit Post</h2>
+            <div className="edit-view">
+              {/* Image Preview */}
+              <div className={`post-image-preview ${
+                (postNewImage || posts.find((p) => p.id === postEditing)?.image) ? '' : 'no-image'
+              }`}>
+                <img
+                  src={
+                    postNewImage
+                      ? URL.createObjectURL(postNewImage)
+                      : posts.find((p) => p.id === postEditing)?.image || "/default-placeholder.svg"
+                  }
+                  alt="Preview"
+                />
+              </div>
 
-            <div className="modal-actions">
-              <button
-                className="btn cancel"
-                onClick={() => setPostEditing(null)}
-              >
-                Cancel
-              </button>
-              <button className="btn save" onClick={handleSavePost}>
-                Save
-              </button>
+              {/* Edit Form */}
+              <div className="edit-form">
+                <input
+                  className="input-title"
+                  type="text"
+                  placeholder="Title"
+                  value={postForm.title}
+                  onChange={(e) => setPostForm({ ...postForm, title: e.target.value })}
+                />
+                <textarea
+                  className="textarea-desc"
+                  placeholder="Description"
+                  rows={8}
+                  value={postForm.desc}
+                  onChange={(e) => setPostForm({ ...postForm, desc: e.target.value })}
+                />
+                <label className="image-upload-label">
+                  <span className="label-text">Change Image (optional):</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setPostNewImage(e.target.files?.[0] || null)}
+                  />
+                  {postNewImage && <span className="file-name">{postNewImage.name}</span>}
+                </label>
+                <div className="form-actions">
+                  <button className="btn btn-save" onClick={handleSavePost} disabled={postSaving}>
+                    {postSaving ? "💾 Saving..." : "💾 Save Changes"}
+                  </button>
+                  <button className="btn btn-cancel" onClick={() => setPostEditing(null)} disabled={postSaving}>
+                    ❌ Cancel
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
