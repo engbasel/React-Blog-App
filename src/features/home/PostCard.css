@@ -3,6 +3,7 @@
   border: 1px solid #e5e7eb; /* رمادي فاتح */
   border-radius: 16px;
   padding: 16px;
+  text-decoration: none; 
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.3s ease, transform 0.2s ease;
