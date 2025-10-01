@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { auth, db } from "../../../firebase/config";
 import { collection, query, where, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 import "./MyPosts.css";
 
 export default function MyPosts() {
@@ -10,6 +11,7 @@ export default function MyPosts() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ title: "", desc: "" });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -36,6 +38,13 @@ export default function MyPosts() {
     });
     return () => unsubscribe();
   }, []);
+
+  // Navigate to add-post when there are no posts after loading finishes
+  useEffect(() => {
+    if (!loading && posts.length === 0) {
+      navigate("/add");
+    }
+  }, [loading, posts.length, navigate]);
 
   if (loading) return <p className="loading">⏳ Loading your posts...</p>;
 
@@ -75,7 +84,38 @@ export default function MyPosts() {
   return (
     <div className="myposts-container">
       {posts.length === 0 ? (
-        <p className="empty">⚠️ You haven't posted anything yet.</p>
+        <section className="empty-posts" style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          backgroundColor: "#f9f9f9",
+          borderRadius: "16px",
+          boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
+        }}>
+          <h2 className="empty-title" style={{
+            fontSize: "24px",
+            fontWeight: "bold",
+            color: "#222",
+            marginBottom: "16px",
+          }}>No posts yet</h2>
+          <p className="empty-subtitle" style={{
+            fontSize: "18px",
+            color: "#444",
+            textAlign: "center",
+            maxWidth: "400px",
+          }}>Get started and create your own posts!</p>
+          <button className="add-post-btn" onClick={() => navigate("/add")} style={{
+            padding: "12px",
+            borderRadius: "8px",
+            border: "none",
+            backgroundColor: "#10b981",
+            color: "#fff",
+            fontWeight: "600",
+            cursor: "pointer",
+          }}>Add Post</button>
+        </section>
       ) : (
         <div className="posts-grid">
           {posts.map((post) => (
